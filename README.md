@@ -21,9 +21,9 @@ The -Z and -U options are obviously mutually exclusive and only one must be supp
 For the -A and -s options default locations for the source files and the zipped files are found in appsettings.json and are not required in the parameters. These can be over-written, however, by paths given against the -z and -u parameters.<br/> 
 For the -F option, paths **must** be supplied against both the -z and -u parameters.<br/><br/>
 
-The most common usage is simply to zip the MDR's source XML files prior to backup on an external machine: **..\MDR_Zippr.exe -Z -A**<br/>
-On an external machine, the files can be restored by **..\MDR_Zippr.exe -U -A**, or with designated sources, e.g.: **..\MDR_Zippr.exe -U -s "100120, 100121, 100122, 100123"**<br/>
-Zipping a designated foder would require a command such as: **..\MDR_Zippr.exe -Z -F -u "C:\JSON Files\OpenAire Export" -z "C:\exports\OpenAire"**<br/>
+The most common usage is simply to zip the MDR's source XML files prior to backup on an external machine: **..\MDR_Zipper.exe -Z -A**<br/>
+On an external machine, the files can be restored by **..\MDR_Zipper.exe -U -A**, or with designated sources, e.g.: **..\MDR_Zipper.exe -U -s "100120, 100121, 100122, 100123"**<br/>
+Zipping a designated foder would require a command such as: **..\MDR_Zipper.exe -Z -F -u "C:\JSON Files\OpenAire Export" -z "C:\exports\OpenAire"**<br/>
 
 ## Dependencies
 The program used the Nuget packages:
