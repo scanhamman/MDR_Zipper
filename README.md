@@ -1,13 +1,11 @@
 # MDR_Zipper
 
 Zips or Unzips all or selected MDR folders, or the files in a designated folder.<br/>
-The system is a console app, (to more easily support being scheduled).<br/><br/>
-
+The system is a console app, (to more easily support being scheduled).<br/>
 This program is normally used to take the files in one or more folders of MDR source (XML) files and creates zip files out of them, as scheduled - currently twice a week.
 This is largely to make it easier to move the data around, e.g. in the context of taking backups.<br/>
 It can also be used to zip a designated folder - e.g. if a set of json files are created and need to be zipped on a scheduled basis. Note that only files should be included in the folder - there should not be any subfolders.<br/>
 A new zip file is created each 10,000 source files, or in some cases when the zip file size exceeds 18MB, so the program may generate (or consume) several zip files for each source. Zip files are always date stamped and include an indication of the number / sequence of the contained files.<br/>
-
 
 ## Parameters and Usage
 The system can take takes the following parameters:<br/>
@@ -26,6 +24,12 @@ For the -F option, paths **must** be supplied against both the -z and -u paramet
 The most common usage is simply to zip the MDR's source XML files prior to backup on an external machine: **..\MDR_Zippr.exe -Z -A**<br/>
 On an external machine, the files can be restored by **..\MDR_Zippr.exe -U -A**, or with designated sources, e.g.: **..\MDR_Zippr.exe -U -s "100120, 100121, 100122, 100123"**<br/>
 Zipping a designated foder would require a command such as: **..\MDR_Zippr.exe -Z -F -u "C:\JSON Files\OpenAire Export" -z "C:\exports\OpenAire"**<br/>
+
+## Dependencies
+The program used the Nuget packages:
+* CommandLineParser - to carry out intiial processing of the CLI arguments
+* Npgsql, Dapper and Dapper.contrib to handle dtabase connectivity
+* microsft.configuration.extensions.json to read the json settings file
 
 ## Provenance
 **Author:** Steve Canham<br/>
