@@ -12,8 +12,8 @@ The system can take takes the following parameters:<br/>
 **-Z:** as a flag. Indicates that the program's action is to zip files.<br/>
 **-U:** as a flag. Indicates that the program's action is to unzip files.<br/>
 **-A:** as a flag. If present, runs through all the MDR sources / folders, and so allows the entire MDR zipping / unzipping operation to be done at once.<br/>
-**-s:** followed by a comma separated list of MDR source integer ids, each representing a data source, and therefore folder, within the system. If present the zipping / unzipping is applied only to those data sources.
-**-F:** as a flag. If present, indicates the zipping / unzipping is to be applied to a folder rather than an MDR source. 
+**-s:** followed by a comma separated list of MDR source integer ids, each representing a data source, and therefore folder, within the system. If present the zipping / unzipping is applied only to those data sources.<br/>
+**-F:** as a flag. If present, indicates the zipping / unzipping is to be applied to a folder rather than an MDR source. <br/>
 **-z:** followed by the full path of a folder, indicating where zipped files are to be found or placed.<br/>
 **-u:** followed by the full path of a folder, indicating where unzipped files are to be found or placed. <br/><br/>
 
