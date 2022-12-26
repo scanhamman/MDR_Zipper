@@ -1,4 +1,4 @@
-﻿namespace FileZipper;
+﻿namespace MDR_Zipper;
 
 internal class Zipper
 {

@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System;
 
-namespace FileZipper;
+namespace MDR_Zipper;
 
 internal class UnZippingHelper
 {
@@ -37,7 +37,7 @@ internal class UnZippingHelper
     internal int UnzipMDRFilesIntoMultipleFolders(int? grouping_range, string zipped_path, string unzipped_path)
     {   
         string full_file_path, folder_path, file_name;
-        int file_stem_length, drop_length = 0;
+        int file_stem_length, last_backslash, drop_length = 0;
         string folder_suffix = "";
 
         string[]? source_zip_list = Directory.GetFiles(zipped_path);
@@ -87,13 +87,16 @@ internal class UnZippingHelper
                         for (int j = 0; j < unzipped_list.Length; j++)
                         {
                             full_file_path = unzipped_list[j];
+                            last_backslash = full_file_path.LastIndexOf("\\") + 1;
+                            file_name = full_file_path[last_backslash..];
+
                             file_stem_length = full_file_path.Length - drop_length;
-                            file_name = full_file_path.Substring(full_file_path.LastIndexOf("\\") + 1);
-                            folder_path = full_file_path.Substring(0, file_stem_length) + folder_suffix;
+                            folder_path = full_file_path[..file_stem_length] + folder_suffix;
                             if (!Directory.Exists(folder_path))
                             {
                                 Directory.CreateDirectory(folder_path);
                             }
+
                             // move file to folder
                             File.Move(full_file_path, Path.Combine(folder_path, file_name));
                         }

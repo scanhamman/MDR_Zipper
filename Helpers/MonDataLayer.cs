@@ -3,7 +3,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace FileZipper;
+namespace MDR_Zipper;
 
 internal class MonDataLayer
 {
@@ -19,18 +19,34 @@ internal class MonDataLayer
             .AddJsonFile("appsettings.json")
             .Build();
 
-        NpgsqlConnectionStringBuilder builder = new()
-        {
-            Host = settings["host"],
-            Username = settings["user"],
-            Password = settings["password"],
+        NpgsqlConnectionStringBuilder builder = new();
+        builder.Host = settings["host"];
+        builder.Username = settings["user"];
+        builder.Password = settings["password"];
 
-            Database = "mon"
-        };
+        string? PortAsString = settings["port"];
+        if (string.IsNullOrWhiteSpace(PortAsString))
+        {
+            builder.Port = 5432;
+        }
+        else
+        {
+            int port_num;
+            if (Int32.TryParse(PortAsString, out port_num))
+            {
+                builder.Port = port_num;
+            }
+            else
+            {
+                builder.Port = 5432;
+            }
+        }
+
+        builder.Database = "mon";
         connString = builder.ConnectionString;
 
-        zipped_parent_folder = settings["zipped parent folder"] ?? "";
-        unzipped_parent_folder = settings["unzipped parent folder"] ?? "";
+        zipped_parent_folder = settings["zippedparentfolder"] ?? "";
+        unzipped_parent_folder = settings["unzippedparentfolder"] ?? "";
     }
 
     internal Source SourceParameters => source!;

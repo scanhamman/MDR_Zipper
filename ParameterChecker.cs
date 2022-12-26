@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace FileZipper;
+namespace MDR_Zipper;
 
 internal class ParameterChecker
 {
@@ -60,7 +60,7 @@ internal class ParameterChecker
 
             // The scenarios below are logically exclusive 
 
-            if (opts.SourceIds is not null && opts.SourceIds.Any())
+            if (opts.SourceIds?.Any() == true)
             {
                 // An MDR based zipping exercise - Use defaults from the appsettings.json file)
                 // for zipped and unzipped parent folders unless alternatives supplied

@@ -1,6 +1,6 @@
 ﻿using System.IO.Compression;
 
-namespace FileZipper;
+namespace MDR_Zipper;
 
 internal class ZippingHelper
 {
@@ -58,7 +58,7 @@ internal class ZippingHelper
             new_zip_required = false;  
             source_folder = folder_list[k];
             folder_backslash = source_folder.LastIndexOf("\\") + 1;
-            string first_folder = source_folder.Substring(folder_backslash);
+            string first_folder = source_folder[folder_backslash..];
 
             // While the file is being constructed the file name is the provisional one below.
 
@@ -74,7 +74,7 @@ internal class ZippingHelper
                 {
                     source_folder = folder_list[k];
                     folder_backslash = source_folder.LastIndexOf("\\") + 1;
-                    folder_name = source_folder.Substring(folder_backslash);
+                    folder_name = source_folder[folder_backslash..];
                     last_used_folder_name = folder_name;
 
                     string[] file_list = Directory.GetFiles(source_folder);
@@ -82,8 +82,8 @@ internal class ZippingHelper
                         for (int i = 0; i < file_list.Length; i++)
                         {
                             source_file_path = file_list[i];
-                            file_backslash = source_file_path.LastIndexOf("\\");
-                            entry_name = source_file_path.Substring(file_backslash);
+                            file_backslash = source_file_path.LastIndexOf("\\") + 1;
+                            entry_name = source_file_path[folder_backslash..];
                             zip.CreateEntryFromFile(source_file_path, entry_name);
                         }
                     }
@@ -125,7 +125,7 @@ internal class ZippingHelper
         {
             // zip file name starts with the source path after the drive letter, with back slashes replaced.
 
-            string file_name_stem = source_path.Substring(3).Replace("\\", "-");
+            string file_name_stem = source_path[3..].Replace("\\", "-");
             ZipFiles(source_file_list, dest_path, file_name_stem);
         }
     }
@@ -142,7 +142,7 @@ internal class ZippingHelper
                                    ? file_num / files_per_zip
                                    : (file_num / files_per_zip) + 1;
 
-        for (int j = 0; j < zip_files_needed; j++)
+        for ( int j = 0; j < zip_files_needed; j++)
         {
             // Get the start and end position in the file list for this pass,
             // and string equivalents for the zip file title.
@@ -181,7 +181,7 @@ internal class ZippingHelper
                 {
                     source_file_path = file_list[i];
                     last_backslash = source_file_path.LastIndexOf("\\") + 1;
-                    entry_name = source_file_path.Substring(last_backslash);
+                    entry_name = source_file_path[last_backslash..];
                     zip.CreateEntryFromFile(source_file_path, entry_name);
                 }
             }

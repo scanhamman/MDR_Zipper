@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 
-namespace FileZipper;
+namespace MDR_Zipper;
 
 internal class LoggingHelper
 {
@@ -17,11 +17,12 @@ internal class LoggingHelper
             .Build();
 
         logfile_startofpath = settings["logfilepath"] ?? "";
+        logfile_path = Path.Combine(logfile_startofpath, "zipping");
 
         string dt_string = DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                           .Replace(":", "").Replace("T", " ");
         
-        logfile_path = logfile_startofpath + "ZIP " + dt_string + ".log";
+        logfile_path = Path.Combine(logfile_path, "ZIP " + dt_string + ".log");
         sw = new StreamWriter(logfile_path, true, System.Text.Encoding.UTF8);
     }
 
