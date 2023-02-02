@@ -24,20 +24,18 @@ internal class ParameterChecker
         var parsedArguments = Parser.Default.ParseArguments<Options>(args);
         if (parsedArguments.Errors.Any())
         {
-            LogParseError(((NotParsed<Options>)parsedArguments).Errors, _logging_helper);
+            LogParseError(((NotParsed<Options>)parsedArguments).Errors);
             return new ParamsCheckResult(true, false, null);
         }
         else
         {
             var opts = parsedArguments.Value;
-            return CheckArgumentValuesAreValid(opts, _logging_helper)
-                       ? new ParamsCheckResult(false, false, opts)
-                       : new ParamsCheckResult(false, true, null);  
+            return CheckArgumentValuesAreValid(opts);
         }
     }
 
 
-    internal bool CheckArgumentValuesAreValid(Options opts, LoggingHelper logging_helper)
+    internal ParamsCheckResult CheckArgumentValuesAreValid(Options opts)
     {
         // Check the parameters - none are required but one of -s, -A or - F must be present.
         // 'opts' is passed by reference and may be changed by the checking mechanism.
@@ -46,7 +44,7 @@ internal class ParameterChecker
         {
             if (opts.DoZip == opts.DoUnzip)
             {
-                // either a zip or unzip, but not both must be specified.
+                // Either a zip or unzip, but not both must be specified.
 
                 throw new ArgumentException("Either Z(ip) or U(nzip), but not both, must be specified");
             }
@@ -101,46 +99,46 @@ internal class ParameterChecker
             // Options should now include either list of MDR sources, OR a flag indicating a folder will be used
             // plus full paths of the parent folders for both zipped and unzipped files.
 
-            return true;
+            return new ParamsCheckResult(false, false, opts);
         }
 
         catch (Exception e)
         {
-            logging_helper.LogHeader("INVALID PARAMETERS");
-            logging_helper.LogCommandLineParameters(opts);
-            logging_helper.LogCodeError("File Zipper application aborted", e.Message, e.StackTrace ?? "");
-            logging_helper.CloseLog();
-            return false;
+            _logging_helper.LogHeader("INVALID PARAMETERS");
+            _logging_helper.LogCommandLineParameters(opts);
+            _logging_helper.LogCodeError("File Zipper application aborted", e.Message, e.StackTrace ?? "");
+            _logging_helper.CloseLog();
+            return new ParamsCheckResult(false, true, null);
         }
     }
 
 
-    internal void LogParseError(IEnumerable<Error> errs, LoggingHelper logging_helper)
+    internal void LogParseError(IEnumerable<Error> errs)
     {
-        logging_helper.LogHeader("UNABLE TO PARSE PARAMETERS");
-        logging_helper.LogHeader("Error in input parameters");
-        logging_helper.LogLine("Error in the command line arguments - they could not be parsed");
+        _logging_helper.LogHeader("UNABLE TO PARSE PARAMETERS");
+        _logging_helper.LogHeader("Error in input parameters");
+        _logging_helper.LogLine("Error in the command line arguments - they could not be parsed");
 
         int n = 0;
         foreach (Error e in errs)
         {
             n++;
-            logging_helper.LogParseError("Error {n}: Tag was {Tag}", n.ToString(), e.Tag.ToString());
+            _logging_helper.LogParseError("Error {n}: Tag was {Tag}", n.ToString(), e.Tag.ToString());
             if (e.GetType().Name == "UnknownOptionError")
             {
-                logging_helper.LogParseError("Error {n}: Unknown option was {UnknownOption}", n.ToString(), ((UnknownOptionError)e).Token);
+                _logging_helper.LogParseError("Error {n}: Unknown option was {UnknownOption}", n.ToString(), ((UnknownOptionError)e).Token);
             }
             if (e.GetType().Name == "MissingRequiredOptionError")
             {
-                logging_helper.LogParseError("Error {n}: Missing option was {MissingOption}", n.ToString(), ((MissingRequiredOptionError)e).NameInfo.NameText);
+                _logging_helper.LogParseError("Error {n}: Missing option was {MissingOption}", n.ToString(), ((MissingRequiredOptionError)e).NameInfo.NameText);
             }
             if (e.GetType().Name == "BadFormatConversionError")
             {
-                logging_helper.LogParseError("Error {n}: Wrongly formatted option was {MissingOption}", n.ToString(), ((BadFormatConversionError)e).NameInfo.NameText);
+                _logging_helper.LogParseError("Error {n}: Wrongly formatted option was {MissingOption}", n.ToString(), ((BadFormatConversionError)e).NameInfo.NameText);
             }
         }
-        logging_helper.LogLine("Importer application aborted");
-        logging_helper.CloseLog();
+        _logging_helper.LogLine("Importer application aborted");
+        _logging_helper.CloseLog();
     }
 }
 
