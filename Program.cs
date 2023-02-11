@@ -29,12 +29,12 @@ else
         // zipping or unzipping function passing the command line arguments.
 
         var opts = paramsCheck.Pars!;     
-        if (opts.DoZip)
+        if (opts.DoZip is true)
         {
             Zipper zipper = new(loggingHelper, dataLayer);
             zipper.ZipFiles(opts);
         }
-        if (opts.DoUnzip)
+        if (opts.DoUnzip is true)
         {
             Unzipper un_zipper = new(loggingHelper, dataLayer);
             un_zipper.UnZipFiles(opts);

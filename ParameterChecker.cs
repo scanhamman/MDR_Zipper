@@ -1,16 +1,17 @@
-﻿using CommandLine;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommandLine;
 
 namespace MDR_Zipper;
 
 internal class ParameterChecker
 {
-    private readonly LoggingHelper _logging_helper;
-    private readonly MonDataLayer _data_layer;
+    private readonly LoggingHelper _loggingHelper;
+    private readonly MonDataLayer _dataLayer;
 
-    internal ParameterChecker(LoggingHelper logging_helper, MonDataLayer data_layer)
+    internal ParameterChecker(LoggingHelper loggingHelper, MonDataLayer dataLayer)
     {
-        _logging_helper = logging_helper;
-        _data_layer = data_layer;
+        _loggingHelper = loggingHelper;
+        _dataLayer = dataLayer;
     }
 
 
@@ -35,7 +36,7 @@ internal class ParameterChecker
     }
 
 
-    internal ParamsCheckResult CheckArgumentValuesAreValid(Options opts)
+    private ParamsCheckResult CheckArgumentValuesAreValid(Options opts)
     {
         // Check the parameters - none are required but one of -s, -A or - F must be present.
         // 'opts' is passed by reference and may be changed by the checking mechanism.
@@ -53,7 +54,7 @@ internal class ParameterChecker
             {
                 // -A flag just a short cut for all MDR sources - set source_ids accordingly.
 
-                opts.SourceIds = _data_layer.RetrieveDataSourceIds();
+                opts.SourceIds = _dataLayer.RetrieveDataSourceIds();
             }
 
             // The scenarios below are logically exclusive 
@@ -66,13 +67,13 @@ internal class ParameterChecker
                 if (opts.UnzippedParentFolderPath is null ||
                     (opts.UnzippedParentFolderPath is not null && !Directory.Exists(opts.UnzippedParentFolderPath)))
                 {
-                    opts.UnzippedParentFolderPath = _data_layer.UnzippedParentFolder;
+                    opts.UnzippedParentFolderPath = _dataLayer.UnzippedParentFolder;
                 }
 
                 if (opts.ZippedParentFolderPath is null ||
                     (opts.ZippedParentFolderPath is not null && !Directory.Exists(opts.ZippedParentFolderPath)))
                 {
-                    opts.ZippedParentFolderPath = _data_layer.ZippedParentFolder;
+                    opts.ZippedParentFolderPath = _dataLayer.ZippedParentFolder;
                 }
             }
             else if (opts.UseFolder == true)
@@ -104,45 +105,47 @@ internal class ParameterChecker
 
         catch (Exception e)
         {
-            _logging_helper.LogHeader("INVALID PARAMETERS");
-            _logging_helper.LogCommandLineParameters(opts);
-            _logging_helper.LogCodeError("File Zipper application aborted", e.Message, e.StackTrace ?? "");
-            _logging_helper.CloseLog();
+            _loggingHelper.LogHeader("INVALID PARAMETERS");
+            _loggingHelper.LogCommandLineParameters(opts);
+            _loggingHelper.LogCodeError("File Zipper application aborted", e.Message, e.StackTrace ?? "");
+            _loggingHelper.CloseLog();
             return new ParamsCheckResult(false, true, null);
         }
     }
 
 
-    internal void LogParseError(IEnumerable<Error> errs)
+    private void LogParseError(IEnumerable<Error> errs)
     {
-        _logging_helper.LogHeader("UNABLE TO PARSE PARAMETERS");
-        _logging_helper.LogHeader("Error in input parameters");
-        _logging_helper.LogLine("Error in the command line arguments - they could not be parsed");
+        _loggingHelper.LogHeader("UNABLE TO PARSE PARAMETERS");
+        _loggingHelper.LogHeader("Error in input parameters");
+        _loggingHelper.LogLine("Error in the command line arguments - they could not be parsed");
 
         int n = 0;
         foreach (Error e in errs)
         {
             n++;
-            _logging_helper.LogParseError("Error {n}: Tag was {Tag}", n.ToString(), e.Tag.ToString());
+            _loggingHelper.LogParseError("Error {n}: Tag was {Tag}", n.ToString(), e.Tag.ToString());
             if (e.GetType().Name == "UnknownOptionError")
             {
-                _logging_helper.LogParseError("Error {n}: Unknown option was {UnknownOption}", n.ToString(), ((UnknownOptionError)e).Token);
+                _loggingHelper.LogParseError("Error {n}: Unknown option was {UnknownOption}", n.ToString(), ((UnknownOptionError)e).Token);
             }
             if (e.GetType().Name == "MissingRequiredOptionError")
             {
-                _logging_helper.LogParseError("Error {n}: Missing option was {MissingOption}", n.ToString(), ((MissingRequiredOptionError)e).NameInfo.NameText);
+                _loggingHelper.LogParseError("Error {n}: Missing option was {MissingOption}", n.ToString(), ((MissingRequiredOptionError)e).NameInfo.NameText);
             }
             if (e.GetType().Name == "BadFormatConversionError")
             {
-                _logging_helper.LogParseError("Error {n}: Wrongly formatted option was {MissingOption}", n.ToString(), ((BadFormatConversionError)e).NameInfo.NameText);
+                _loggingHelper.LogParseError("Error {n}: Wrongly formatted option was {MissingOption}", n.ToString(), ((BadFormatConversionError)e).NameInfo.NameText);
             }
         }
-        _logging_helper.LogLine("Importer application aborted");
-        _logging_helper.CloseLog();
+        _loggingHelper.LogLine("Importer application aborted");
+        _loggingHelper.CloseLog();
     }
 }
 
 
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class Options
 {
     // This class and its members appears to need to be public or CommandLineParser 
@@ -150,19 +153,19 @@ public class Options
 
     // Lists the command line arguments and options
     [Option('Z', "zip", Required = false, HelpText = "If present, zip the designated files")]
-    public bool DoZip { get; set; }
+    public bool? DoZip { get; set; }
 
     [Option('U', "unzip", Required = false, HelpText = "If present, unzip the designated files")]
-    public bool DoUnzip { get; set; }
+    public bool? DoUnzip { get; set; }
 
     [Option('s', "process specific MDR sources", Required = false, Separator = ',', HelpText = "Comma separated list of Integer ids of MDR data sources.")]
     public IEnumerable<int>? SourceIds { get; set; }
 
     [Option('A', "process all MDR sources", Required = false, HelpText = "If present, zips or unzips the MDR XML files from all source folders")]
-    public bool AllSources { get; set; }
+    public bool? AllSources { get; set; }
 
     [Option('F', "process folder", Required = false, HelpText = "If present, zips the files produced by aggregation")]
-    public bool UseFolder { get; set; }
+    public bool? UseFolder { get; set; }
 
     [Option('z', "zipped files parent folder", Required = false, HelpText = "The parent folder for zipped files, required if -F present else optional")]
     public string? ZippedParentFolderPath { get; set; }
@@ -178,11 +181,11 @@ internal class ParamsCheckResult
     internal bool ValidityError { get; set; }
     internal Options? Pars { get; set; }
 
-    internal ParamsCheckResult(bool _ParseError, bool _ValidityError, Options? _Pars)
+    internal ParamsCheckResult(bool parseError, bool validityError, Options? pars)
     {
-        ParseError = _ParseError;
-        ValidityError = _ValidityError;
-        Pars = _Pars;
+        ParseError = parseError;
+        ValidityError = validityError;
+        Pars = pars;
     }
 }
 

@@ -2,7 +2,7 @@
   "profiles": {
     "MDR_Zipper": {
       "commandName": "Project",
-      "commandLineArgs": "-Z -A"
+      "commandLineArgs": "-U -A"
     }
   }
 }

@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
-
-
 namespace MDR_Zipper;
 
 internal class LoggingHelper
 {
-    private readonly string? logfile_startofpath;
-    private readonly string? logfile_path;
-    private readonly StreamWriter? sw;
+    private readonly StreamWriter? _sw;
 
     internal LoggingHelper()
     {
@@ -16,36 +12,36 @@ internal class LoggingHelper
             .AddJsonFile("appsettings.json")
             .Build();
 
-        logfile_startofpath = settings["logfilepath"] ?? "";
-        logfile_path = Path.Combine(logfile_startofpath, "zipping");
+        var logfileStartOfPath = settings["logfilepath"] ?? "";
+        var logfilePath = Path.Combine(logfileStartOfPath, "zipping");
 
         string dt_string = DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                           .Replace(":", "").Replace("T", " ");
         
-        logfile_path = Path.Combine(logfile_path, "ZIP " + dt_string + ".log");
-        sw = new StreamWriter(logfile_path, true, System.Text.Encoding.UTF8);
+        logfilePath = Path.Combine(logfilePath, "ZIP " + dt_string + ".log");
+        _sw = new StreamWriter(logfilePath, true, System.Text.Encoding.UTF8);
     }
 
 
     internal void LogCommandLineParameters(Options opts)
     {
-        string action = opts.DoZip ? "Zipping " : "Unzipping ";
+        string action = opts.DoZip is true ? "Zipping " : "Unzipping ";
         LogLine("ACTION: " + action.ToUpper());
 
-        if (opts.AllSources == true && opts.SourceIds is not null && opts.SourceIds.Any())
+        if (opts.AllSources is true && opts.SourceIds?.Any() is true)
         {
             LogLine(action + "all MDR sources");
             int[] source_ids = opts.SourceIds.ToArray();
             LogLine("Source_ids are " + string.Join(",", source_ids));
         }
 
-        if (opts.AllSources != true && opts.SourceIds is not null && opts.SourceIds != null)
+        if (opts.AllSources is not true && opts.SourceIds?.Any() is true)
         {
             LogLine(action + "selected MDR sources");
             int[] source_ids = opts.SourceIds.ToArray();
             if (source_ids.Length == 1)
             {
-                LogLine("Source_id is " + source_ids[0].ToString());
+                LogLine("Source_id is " + source_ids[0]);
             }
             else
             {
@@ -116,17 +112,17 @@ internal class LoggingHelper
 
     internal void CloseLog()
     {
-        if (sw != null)
+        if (_sw != null)
         {
             LogHeader("Closing Log");
-            sw.Flush();
-            sw.Close();
+            _sw.Flush();
+            _sw.Close();
         }
     }
 
     private void Transmit(string message)
     {
-        sw?.WriteLine(message);
+        _sw?.WriteLine(message);
         Console.WriteLine(message);
     }
 }

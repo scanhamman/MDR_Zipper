@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Diagnostics.CodeAnalysis;
+using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
@@ -7,10 +8,10 @@ namespace MDR_Zipper;
 
 internal class MonDataLayer
 {
-    private readonly string? connString;
-    private readonly string? zipped_parent_folder;
-    private readonly string? unzipped_parent_folder;
-    private Source? source;
+    private readonly string? _connString;
+    private readonly string? _zippedParentFolder;
+    private readonly string? _unzippedParentFolder;
+    private Source? _source;
 
     internal MonDataLayer()
     {
@@ -24,17 +25,16 @@ internal class MonDataLayer
         builder.Username = settings["user"];
         builder.Password = settings["password"];
 
-        string? PortAsString = settings["port"];
-        if (string.IsNullOrWhiteSpace(PortAsString))
+        string? portAsString = settings["port"];
+        if (string.IsNullOrWhiteSpace(portAsString))
         {
             builder.Port = 5432;
         }
         else
         {
-            int port_num;
-            if (Int32.TryParse(PortAsString, out port_num))
+            if (Int32.TryParse(portAsString, out int portNum))
             {
-                builder.Port = port_num;
+                builder.Port = portNum;
             }
             else
             {
@@ -43,22 +43,22 @@ internal class MonDataLayer
         }
 
         builder.Database = "mon";
-        connString = builder.ConnectionString;
+        _connString = builder.ConnectionString;
 
-        zipped_parent_folder = settings["zippedparentfolder"] ?? "";
-        unzipped_parent_folder = settings["unzippedparentfolder"] ?? "";
+        _zippedParentFolder = settings["zippedparentfolder"] ?? "";
+        _unzippedParentFolder = settings["unzippedparentfolder"] ?? "";
     }
 
-    internal Source SourceParameters => source!;
-    internal string ZippedParentFolder => zipped_parent_folder!;
-    internal string UnzippedParentFolder => unzipped_parent_folder!;
+    internal Source SourceParameters => _source!;
+    internal string ZippedParentFolder => _zippedParentFolder!;
+    internal string UnzippedParentFolder => _unzippedParentFolder!;
 
 
-    internal Source FetchSourceParameters(int source_id)
+    internal Source FetchSourceParameters(int sourceId)
     {
-        using NpgsqlConnection Conn = new (connString);
-        source = Conn.Get<Source>(source_id);
-        return source;
+        using NpgsqlConnection conn = new (_connString);
+        _source = conn.Get<Source>(sourceId);
+        return _source;
     }
 
 
@@ -68,7 +68,7 @@ internal class MonDataLayer
                                 where id > 100115
                                 order by preference_rating;";
 
-        using NpgsqlConnection conn = new (connString);
+        using NpgsqlConnection conn = new (_connString);
         return conn.Query<int>(sql_string);
     }
 
@@ -78,6 +78,8 @@ internal class MonDataLayer
 // cannot read the field names properly
 
 [Table("sf.source_parameters")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class Source
 {
     public int id { get; set; }

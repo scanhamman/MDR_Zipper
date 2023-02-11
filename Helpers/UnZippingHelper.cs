@@ -1,32 +1,30 @@
 ﻿using System.IO.Compression;
-using System;
 
 namespace MDR_Zipper;
 
 internal class UnZippingHelper
 {
-    private readonly LoggingHelper _logging_helper;
+    private readonly LoggingHelper _loggingHelper;
 
-    internal UnZippingHelper(LoggingHelper logging_helper)
+    internal UnZippingHelper(LoggingHelper loggingHelper)
     {
-        _logging_helper = logging_helper;
+        _loggingHelper = loggingHelper;
     }
 
 
-    internal int UnzipMDRFilesIntoSingleFolder(string zipped_path, string unzip_path)
+    internal int UnzipMdrFilesIntoSingleFolder(string zippedPath, string unzipPath)
     {
-        string[]? source_zip_list = Directory.GetFiles(zipped_path);
+        string[] source_zip_list = Directory.GetFiles(zippedPath);
         int n = 0;
-
-        if (source_zip_list is not null)
+        if (source_zip_list.Any())
         {
-            for (int i = 0; i < source_zip_list.Length; i++)
+            foreach (string sz in source_zip_list)
             {
-                if (source_zip_list[i].ToLower().EndsWith(".zip"))
+                if (sz.ToLower().EndsWith(".zip"))
                 {
-                    ZipFile.ExtractToDirectory(source_zip_list[i], unzip_path);
+                    ZipFile.ExtractToDirectory(sz, unzipPath);
                     n++;
-                    _logging_helper.LogLine("Unzipped " + source_zip_list[i]);
+                    _loggingHelper.LogLine("Unzipped " + sz);
                 }
             }
         }
@@ -34,22 +32,21 @@ internal class UnZippingHelper
     }
 
 
-    internal int UnzipMDRFilesIntoMultipleFolders(int? grouping_range, string zipped_path, string unzipped_path)
-    {   
-        string full_file_path, folder_path, file_name;
-        int file_stem_length, last_backslash, drop_length = 0;
+    internal int UnzipMdrFilesIntoMultipleFolders(int? groupingRange, string zippedPath, string unzippedPath)
+    {
+        int drop_length = 0;
         string folder_suffix = "";
 
-        string[]? source_zip_list = Directory.GetFiles(zipped_path);
+        string[] source_zip_list = Directory.GetFiles(zippedPath);
         int n = 0;
 
-        if (grouping_range is not null)
+        if (groupingRange is not null)
         {
             // obtain parameters for later bundling operation
 
             int j = 10;
             folder_suffix = "x";
-            while (j != grouping_range)  // grouping range always a power of 10, e.g. 10000
+            while (j != groupingRange)  // grouping range always a power of 10, e.g. 10000
             {
                 j *= 10;
                 folder_suffix += "x";
@@ -57,40 +54,42 @@ internal class UnZippingHelper
             drop_length = folder_suffix.Length + 4;   // additional 4 required for '.xml'
         }
 
-
-        if (source_zip_list is not null)
+        if (source_zip_list.Any())
         {
-            for (int i = 0; i < source_zip_list.Length; i++)
+            foreach (string sz in source_zip_list)
             {
-                if (source_zip_list[i].ToLower().EndsWith(".zip"))
+                if (sz.ToLower().EndsWith(".zip"))
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(source_zip_list[i]))
+                    using (ZipArchive archive = ZipFile.OpenRead(sz))
                     {
-                        // extract each file to the parent folder initially
+                        // extract each file to the parent folder initially.
+                        
                         foreach (ZipArchiveEntry entry in archive.Entries)
                         {
                             // Gets the full path to ensure that relative segments are removed.
-                            string destinationPath = Path.Combine(unzipped_path, entry.Name);
+                            
+                            string destinationPath = Path.Combine(unzippedPath, entry.Name);
                             entry.ExtractToFile(destinationPath);
                         }
                     }
                     n++;
                 }
 
-                if (grouping_range is not null)
+                if (groupingRange is not null)
                 {
                     // files just unzipped will need bundling up into separate folders....
 
-                    string[]? unzipped_list = Directory.GetFiles(unzipped_path);
-                    if (unzipped_list is not null && unzipped_list.Any())
+                    string[] unzipped_list = Directory.GetFiles(unzippedPath);
+                    if (unzipped_list.Any())
                     {
-                        for (int j = 0; j < unzipped_list.Length; j++)
+                        string full_file_path, folder_path, file_name;
+                        foreach (string f in unzipped_list)
                         {
-                            full_file_path = unzipped_list[j];
-                            last_backslash = full_file_path.LastIndexOf("\\") + 1;
+                            full_file_path = f;
+                            int last_backslash = full_file_path.LastIndexOf("\\", StringComparison.Ordinal) + 1;
                             file_name = full_file_path[last_backslash..];
 
-                            file_stem_length = full_file_path.Length - drop_length;
+                            int file_stem_length = full_file_path.Length - drop_length;
                             folder_path = full_file_path[..file_stem_length] + folder_suffix;
                             if (!Directory.Exists(folder_path))
                             {
@@ -102,34 +101,31 @@ internal class UnZippingHelper
                         }
                     }
                 }
-
-                _logging_helper.LogLine("Unzipped " + source_zip_list[i]);
+                _loggingHelper.LogLine("Unzipped " + sz);
             }
         }
         return n;
     }
 
 
-    internal void UnzipFolder(string source_path, string dest_path)
+    internal void UnzipFolder(string sourcePath, string destPath)
     {
         // Source path should not contain sub-folders (if present they will be ignored).
-
-        string[]? source_file_list = Directory.GetFiles(source_path);
+        // Looks for any .zip files and unzip tem if found.
+        
+        string[] source_file_list = Directory.GetFiles(sourcePath);
         int n = 0;
-        if (source_file_list?.Length > 0)
+        if (source_file_list.Any())
         {
-            for (int i = 0; i < source_file_list.Length; i++)
+            foreach (string f in source_file_list)
             {
-                // Any zip files in the list?
-
-                if (source_file_list[i].ToLower().EndsWith(".zip"))
+                if (f.ToLower().EndsWith(".zip"))
                 {
-                    ZipFile.ExtractToDirectory(source_file_list[i], dest_path);
+                    ZipFile.ExtractToDirectory(f, destPath);
                     n++;
                 }
             }
-
-            _logging_helper.LogLine("Unzipped " + n.ToString() + " zip files from " + source_path);
+            _loggingHelper.LogLine($"Unzipped {n} zip files from {sourcePath}");
         }
     }
 
