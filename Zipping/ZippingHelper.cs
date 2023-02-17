@@ -33,9 +33,7 @@ internal class ZippingHelper
         // not been exceeded after each folder.
                
         long max_zip_size = 18 * 1024 * 1024;     // 18 MB set as max zip size in this context
-        long zip_file_size;                       // Used for current length of zip file    
-        bool new_zip_required;                    // set true if current file size greater than max size
-        
+
         string source_folder, source_file_path, folder_name, entry_name;
         int folder_backslash, file_backslash;
         string last_used_folder_name = "";
@@ -55,7 +53,8 @@ internal class ZippingHelper
             // This code run at the beginning and each time inner loop is exited
             // need to create zip file path using the first folder in this 'batch'.
 
-            new_zip_required = false;  
+            bool new_zip_required = false;         // will be set to true if current file size greater than max size
+  
             source_folder = folder_list[k];
             folder_backslash = source_folder.LastIndexOf("\\", StringComparison.Ordinal) + 1;
             string first_folder = source_folder[folder_backslash..];
@@ -83,14 +82,14 @@ internal class ZippingHelper
                         {
                             source_file_path = f;
                             file_backslash = source_file_path.LastIndexOf("\\", StringComparison.Ordinal) + 1;
-                            entry_name = source_file_path[file_backslash..];
+                            entry_name = source_file_path[folder_backslash..];   // includes folder and file
                             zip.CreateEntryFromFile(source_file_path, entry_name);
                         }
                     }
 
                     file_num += file_list.Length;
                     _loggingHelper.LogLine("Zipped " + folder_name);
-                    zip_file_size = new FileInfo(zip_file_path).Length;
+                    long zip_file_size = new FileInfo(zip_file_path).Length;        // Used for current length of zip file    
 
                     // Is a new zip file required? If not get the next folder and repeat the zipping process.
                     // If yes, the inner while condition becomes false and control returns to the outer loop.

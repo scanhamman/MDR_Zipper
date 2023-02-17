@@ -22,7 +22,7 @@ internal class ParameterChecker
         // and if invalid log the issue and return an error, otherwise return the 
         // parameters, processed as an instance of the Options class.
 
-        var parsedArguments = Parser.Default.ParseArguments<Options>(args);
+        ParserResult<Options>? parsedArguments = Parser.Default.ParseArguments<Options>(args);
         if (parsedArguments.Errors.Any())
         {
             LogParseError(((NotParsed<Options>)parsedArguments).Errors);
@@ -30,7 +30,7 @@ internal class ParameterChecker
         }
         else
         {
-            var opts = parsedArguments.Value;
+            Options? opts = parsedArguments.Value;
             return CheckArgumentValuesAreValid(opts);
         }
     }
@@ -50,7 +50,7 @@ internal class ParameterChecker
                 throw new ArgumentException("Either Z(ip) or U(nzip), but not both, must be specified");
             }
 
-            if (opts.AllSources == true)
+            if (opts.AllSources)
             {
                 // -A flag just a short cut for all MDR sources - set source_ids accordingly.
 
@@ -73,10 +73,21 @@ internal class ParameterChecker
                 if (opts.ZippedParentFolderPath is null ||
                     (opts.ZippedParentFolderPath is not null && !Directory.Exists(opts.ZippedParentFolderPath)))
                 {
-                    opts.ZippedParentFolderPath = _dataLayer.ZippedParentFolder;
+                    
+                    // If zipping, add the sub-folder indicating the day to the folder path.
+                    if (opts.DoZip)
+                    {
+                        DateTime today = DateTime.Now;
+                        string day_suffix = $"Zips_0" + ((int)today.DayOfWeek + 1) + "_" + today.ToString("ddd") + "\\";
+                        opts.ZippedParentFolderPath = _dataLayer.ZippedParentFolder + day_suffix;
+                    }
+                    else
+                    {
+                        opts.ZippedParentFolderPath = _dataLayer.ZippedParentFolder;
+                    }
                 }
             }
-            else if (opts.UseFolder == true)
+            else if (opts.UseFolder)
             {
                 // values for zipped and unzipped parent folders must be present and valid
 
@@ -153,19 +164,19 @@ public class Options
 
     // Lists the command line arguments and options
     [Option('Z', "zip", Required = false, HelpText = "If present, zip the designated files")]
-    public bool? DoZip { get; set; }
+    public bool DoZip { get; set; }
 
     [Option('U', "unzip", Required = false, HelpText = "If present, unzip the designated files")]
-    public bool? DoUnzip { get; set; }
+    public bool DoUnzip { get; set; }
 
     [Option('s', "process specific MDR sources", Required = false, Separator = ',', HelpText = "Comma separated list of Integer ids of MDR data sources.")]
     public IEnumerable<int>? SourceIds { get; set; }
 
     [Option('A', "process all MDR sources", Required = false, HelpText = "If present, zips or unzips the MDR XML files from all source folders")]
-    public bool? AllSources { get; set; }
+    public bool AllSources { get; set; }
 
     [Option('F', "process folder", Required = false, HelpText = "If present, zips the files produced by aggregation")]
-    public bool? UseFolder { get; set; }
+    public bool UseFolder { get; set; }
 
     [Option('z', "zipped files parent folder", Required = false, HelpText = "The parent folder for zipped files, required if -F present else optional")]
     public string? ZippedParentFolderPath { get; set; }

@@ -56,7 +56,7 @@ internal class Zipper
             }
         }
         
-        if (opts.UseFolder == true)
+        if (opts.UseFolder)
         {
             // If the zipping is folder based (can be any folder) call the routine
             // with the source and destination paths as derived from options.

@@ -12,30 +12,30 @@ internal class LoggingHelper
             .AddJsonFile("appsettings.json")
             .Build();
 
-        var logfileStartOfPath = settings["logfilepath"] ?? "";
-        var logfilePath = Path.Combine(logfileStartOfPath, "zipping");
+        string logFileStartOfPath = settings["logFilePath"] ?? "";
+        string logFilePath = Path.Combine(logFileStartOfPath, "zipping");
 
         string dt_string = DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                           .Replace(":", "").Replace("T", " ");
         
-        logfilePath = Path.Combine(logfilePath, "ZIP " + dt_string + ".log");
-        _sw = new StreamWriter(logfilePath, true, System.Text.Encoding.UTF8);
+        logFilePath = Path.Combine(logFilePath, "ZIP " + dt_string + ".log");
+        _sw = new StreamWriter(logFilePath, true, System.Text.Encoding.UTF8);
     }
 
 
     internal void LogCommandLineParameters(Options opts)
     {
-        string action = opts.DoZip is true ? "Zipping " : "Unzipping ";
+        string action = opts.DoZip ? "Zipping " : "Unzipping ";
         LogLine("ACTION: " + action.ToUpper());
 
-        if (opts.AllSources is true && opts.SourceIds?.Any() is true)
+        if (opts.AllSources && opts.SourceIds?.Any() is true)
         {
             LogLine(action + "all MDR sources");
             int[] source_ids = opts.SourceIds.ToArray();
             LogLine("Source_ids are " + string.Join(",", source_ids));
         }
 
-        if (opts.AllSources is not true && opts.SourceIds?.Any() is true)
+        if (!opts.AllSources && opts.SourceIds?.Any() is true)
         {
             LogLine(action + "selected MDR sources");
             int[] source_ids = opts.SourceIds.ToArray();
@@ -49,7 +49,12 @@ internal class LoggingHelper
             }
         }
 
-        if (opts.UseFolder == true)
+        if (opts.DoZip)
+        {
+            LogLine("Destination folder is " + opts.ZippedParentFolderPath);
+        }
+
+        if (opts.UseFolder)
         {
             LogLine(action + "designated folder");
             LogLine("Folder for unzipped files: " + opts.UnzippedParentFolderPath);

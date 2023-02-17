@@ -28,13 +28,13 @@ else
         // Instantiate the relevant working class and call the main 
         // zipping or unzipping function passing the command line arguments.
 
-        var opts = paramsCheck.Pars!;     
-        if (opts.DoZip is true)
+        Options opts = paramsCheck.Pars!;     
+        if (opts.DoZip)
         {
             Zipper zipper = new(loggingHelper, dataLayer);
             zipper.ZipFiles(opts);
         }
-        if (opts.DoUnzip is true)
+        if (opts.DoUnzip)
         {
             Unzipper un_zipper = new(loggingHelper, dataLayer);
             un_zipper.UnZipFiles(opts);

@@ -51,7 +51,7 @@ internal class UnZippingHelper
                 j *= 10;
                 folder_suffix += "x";
             }
-            drop_length = folder_suffix.Length + 4;   // additional 4 required for '.xml'
+            drop_length = folder_suffix.Length + 5;   // additional 5 required for '.json'
         }
 
         if (source_zip_list.Any())
