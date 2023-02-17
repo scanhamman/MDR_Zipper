@@ -25,13 +25,13 @@ The most common usage is simply to zip the MDR's source JSON files prior to back
 On an external machine, the files can be restored by **..\MDR_Zipper.exe -U -A**, or with designated sources, e.g.: **..\MDR_Zipper.exe -U -s "100120, 100121, 100122, 100123"**<br/>
 Zipping a designated folder would require a command such as: **..\MDR_Zipper.exe -Z -F -u "C:\JSON Files\OpenAire Export" -z "C:\exports\OpenAire"**<br/>
 
-### Dependencies
+## Dependencies
 The program used the Nuget packages:
 * CommandLineParser - to carry out initial processing of the CLI arguments
 * Npgsql, Dapper and Dapper.contrib to handle database connectivity
 * Microsoft.Extensions.Configuration and .Configuration.Json, to read the json settings file.
 
-### Provenance
+## Provenance
 **Author:** Steve Canham<br/>
 **Organisation:** ECRIN (https://ecrin.org)<br/>
 **System:** Clinical Research Metadata Repository (MDR)<br/>
