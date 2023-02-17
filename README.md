@@ -26,10 +26,11 @@ On an external machine, the files can be restored by **..\MDR_Zipper.exe -U -A**
 Zipping a designated folder would require a command such as: **..\MDR_Zipper.exe -Z -F -u "C:\JSON Files\OpenAire Export" -z "C:\exports\OpenAire"**<br/>
 
 ## Dependencies
-The program used the Nuget packages:
-* CommandLineParser - to carry out initial processing of the CLI arguments
-* Npgsql, Dapper and Dapper.contrib to handle database connectivity
-* Microsoft.Extensions.Configuration and .Configuration.Json, to read the json settings file.
+The program is written in .Net 7.0. <br/>
+It uses the following Nuget packages:
+* CommandLineParser 2.9.1 - to carry out initial processing of the CLI arguments
+* Npgsql 7.0.0, Dapper 2.0.123 and Dapper.contrib 2.0.78 to handle database connectivity
+* Microsoft.Extensions.Configuration 7.0.0, and .Configuration.Json 7.0.0 to read the json settings file.
 
 ## Provenance
 **Author:** Steve Canham<br/>
