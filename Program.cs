@@ -20,38 +20,37 @@ if (paramsCheck.ParseError || paramsCheck.ValidityError)
     
     return -1; 
 }
-else
+
+try
 {
-    try
+    // Should be able to proceed - (opts is known to be non-null).
+    // Instantiate the relevant working class and call the main 
+    // zipping or unzipping function passing the command line arguments.
+
+    Options opts = paramsCheck.Pars!;     
+    if (opts.DoZip)
     {
-        // Should be able to proceed - (opts is known to be non-null).
-        // Instantiate the relevant working class and call the main 
-        // zipping or unzipping function passing the command line arguments.
-
-        Options opts = paramsCheck.Pars!;     
-        if (opts.DoZip)
-        {
-            Zipper zipper = new(loggingHelper, dataLayer);
-            zipper.ZipFiles(opts);
-        }
-        if (opts.DoUnzip)
-        {
-            Unzipper un_zipper = new(loggingHelper, dataLayer);
-            un_zipper.UnZipFiles(opts);
-        }
-
-        return 0;
+        Zipper zipper = new(loggingHelper, dataLayer);
+        zipper.ZipFiles(opts);
     }
-    catch (Exception e)
+    if (opts.DoUnzip)
     {
-        // If an error bubbles up to here there is an issue with the code.
-
-        loggingHelper.LogHeader("UNHANDLED EXCEPTION");
-        loggingHelper.LogCodeError("MDR_Zipper application aborted", e.Message, e.StackTrace);
-        loggingHelper.CloseLog();
-
-        return -1;
+        Unzipper un_zipper = new(loggingHelper, dataLayer);
+        un_zipper.UnZipFiles(opts);
     }
+
+    return 0;
 }
+catch (Exception e)
+{
+    // If an error bubbles up to here there is an issue with the code.
+
+    loggingHelper.LogHeader("UNHANDLED EXCEPTION");
+    loggingHelper.LogCodeError("MDR_Zipper application aborted", e.Message, e.StackTrace);
+    loggingHelper.CloseLog();
+
+    return -1;
+}
+
 
 

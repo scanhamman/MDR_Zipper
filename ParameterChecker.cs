@@ -28,11 +28,10 @@ internal class ParameterChecker
             LogParseError(((NotParsed<Options>)parsedArguments).Errors);
             return new ParamsCheckResult(true, false, null);
         }
-        else
-        {
-            Options? opts = parsedArguments.Value;
-            return CheckArgumentValuesAreValid(opts);
-        }
+
+        Options? opts = parsedArguments.Value;
+        return CheckArgumentValuesAreValid(opts);
+
     }
 
 
