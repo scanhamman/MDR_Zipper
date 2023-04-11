@@ -46,6 +46,14 @@ internal class Zipper
                         Directory.CreateDirectory(zipped_parent_path);
                     }
 
+                    if (!Directory.Exists(zipped_parent_path))
+                    {
+                         // Can happen if a new source added to source_parameters table
+                         // before any files exist to be zipped.
+                         
+                         Directory.CreateDirectory(unzipped_parent_path);
+                    }
+
                     _loggingHelper.LogLine("Zipping files from " + s.local_folder);
                     int num = (s.local_files_grouped == true)
                         ? _zh.ZipMdrFilesInMultipleFolders(s.database_name, unzipped_parent_path, zipped_parent_path)

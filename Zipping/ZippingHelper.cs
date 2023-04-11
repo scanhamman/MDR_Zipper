@@ -19,7 +19,9 @@ internal class ZippingHelper
     internal int ZipMdrFilesInSingleFolder(string databaseName, string sourceFolderPath, string zipFolderPath)
     {
         string[] file_list = Directory.GetFiles(sourceFolderPath);
-        return ZipFiles(file_list, zipFolderPath, databaseName);
+        return file_list.Length > 0 
+            ? ZipFiles(file_list, zipFolderPath, databaseName) 
+            : 0;    // if no files in the folder
     }
 
 
@@ -28,7 +30,11 @@ internal class ZippingHelper
         int file_num = 0;
         string[] folder_list = Directory.GetDirectories(sourceFolderPath);
         int folder_num = folder_list.Length;      // total folders in source directory
-
+        if (folder_num == 0)
+        {
+            return 0;  // empty folder list - should not happen but could with a brand new source with no files
+        }
+        
         // produce a zip for each group of folders, checking that the max size has
         // not been exceeded after each folder.
                
