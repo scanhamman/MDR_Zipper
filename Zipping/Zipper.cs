@@ -13,6 +13,7 @@ internal class Zipper
         _zh = new ZippingHelper(_loggingHelper);
     }
 
+    // test comment addition
 
     internal void ZipFiles(Options opts)
     {
