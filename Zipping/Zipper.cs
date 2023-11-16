@@ -29,48 +29,42 @@ internal class Zipper
 
             foreach (int source_id in opts.SourceIds)
             {
-                // ****** The 100120, 100126, 100124, 100132, 100116, 100125, 100128, 100119  exceptions are temporary
-                if (source_id != 100120 && source_id != 100126 && source_id != 100124 
-                    && source_id != 100132 && source_id != 100116
-                    && source_id != 100125 && source_id != 100128 && source_id != 100119)
+                Source s = _dataLayer.FetchSourceParameters(source_id);
+                if (s.database_name is not null && s.id != 100159)
                 {
-                    Source s = _dataLayer.FetchSourceParameters(source_id);
-                    if (s.database_name is not null && s.id != 100159)
+                    // Note that the EMA source - 100159 - is zipped from the same folder
+                    // as the EUCTR source - it should not therefore be done twice!
+
+                    string unzipped_parent_path = Path.Combine(opts.UnzippedParentFolderPath!, s.database_name);
+                    string zipped_parent_path = Path.Combine(opts.ZippedParentFolderPath!, s.database_name);
+                    if (Directory.Exists(zipped_parent_path))
                     {
-                        // Note that the EMA source - 100159 - is zipped from the same folder
-                        // as the EUCTR source - it should not therefore be done twice!
-
-                        string unzipped_parent_path = Path.Combine(opts.UnzippedParentFolderPath!, s.database_name);
-                        string zipped_parent_path = Path.Combine(opts.ZippedParentFolderPath!, s.database_name);
-                        if (Directory.Exists(zipped_parent_path))
+                        string[] filePaths = Directory.GetFiles(zipped_parent_path);
+                        foreach (string filePath in filePaths)
                         {
-                            string[] filePaths = Directory.GetFiles(zipped_parent_path);
-                            foreach (string filePath in filePaths)
-                            {
-                                File.Delete(filePath);
-                            }
+                            File.Delete(filePath);
                         }
-                        else
-                        {
-                            Directory.CreateDirectory(zipped_parent_path);
-                        }
-
-                        if (!Directory.Exists(unzipped_parent_path))
-                        {
-                            // Can happen if a new source added to source_parameters table
-                            // before any files exist to be zipped.
-
-                            Directory.CreateDirectory(unzipped_parent_path);
-                        }
-
-                        _loggingHelper.LogLine("Zipping files from " + s.local_folder);
-                        int num = (s.local_files_grouped == true)
-                            ? _zh.ZipMdrFilesInMultipleFolders(s.database_name, unzipped_parent_path,
-                                zipped_parent_path)
-                            : _zh.ZipMdrFilesInSingleFolder(s.database_name, unzipped_parent_path, zipped_parent_path);
-
-                        _loggingHelper.LogLine("Zipped " + num + " files from " + s.database_name);
                     }
+                    else
+                    {
+                        Directory.CreateDirectory(zipped_parent_path);
+                    }
+
+                    if (!Directory.Exists(unzipped_parent_path))
+                    {
+                        // Can happen if a new source added to source_parameters table
+                        // before any files exist to be zipped.
+
+                        Directory.CreateDirectory(unzipped_parent_path);
+                    }
+
+                    _loggingHelper.LogLine("Zipping files from " + s.local_folder);
+                    int num = (s.local_files_grouped == true)
+                        ? _zh.ZipMdrFilesInMultipleFolders(s.database_name, unzipped_parent_path,
+                            zipped_parent_path)
+                        : _zh.ZipMdrFilesInSingleFolder(s.database_name, unzipped_parent_path, zipped_parent_path);
+
+                    _loggingHelper.LogLine("Zipped " + num + " files from " + s.database_name);
                 }
             }
         }
